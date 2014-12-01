@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8" />
+    <meta author="Koo Dong Hyun, 2014" />
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+
+    <title>Victorious Secret</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/bootstrap.min.css') }}" >
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/main.css') }}" >
+
+</head>
+<body>
+    {% block layout %}{% endblock %}
+    {% block scripts %}
+        <script>
+            var $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
+        </script>
+        <script src="{{ url_for('static', filename='js/jquery-1.11.1.min.js') }}"></script>
+        <script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
+        <script src="{{ url_for('static', filename='js/recorder.js') }}"></script>
+        <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    {% endblock %}
+</body>
+</html>
