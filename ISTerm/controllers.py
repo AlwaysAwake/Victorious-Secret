@@ -11,12 +11,12 @@ def main_page():
     return render_template("main.html")
 
 
-@app.route('/signin', methods=['GET', 'POST'])
-def signin():
+@app.route('/signup', methods=['GET', 'POST'])
+def signup():
     url = "https://siv.voiceprintportal.com/sivservice/api/enrollments/bywavurl"
 
     if request.method == 'GET':
-        return render_template("signin.html")
+        return render_template("signup.html")
     elif request.method == 'POST':
         email = request.form['email']
         wavurl = ""
