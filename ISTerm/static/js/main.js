@@ -3,7 +3,7 @@
  */
 
 $('button#submitemail').bind('click', function(){
-   $('record').css("display: block");
+   $('#record').css("display: block");
    $.ajax({
        url: $SCRIPT_ROOT + "/signin",
        contentType: "application/json; charset=utf-8",
