@@ -63,9 +63,6 @@ def faceregister():
         # show the tracked eyes and face
         cv2.imshow("Tracking", frame)
 
-        # if the 'q' key is pressed, stop the loop
-        if cv2.waitKey(1) & 0xFF == ord("q"):
-            break
         if cv2.waitKey(1) & 0xFF == ord("r"):
             dataInput['id'] = id
             dataInput['face'] = ratioGet(rects)
@@ -86,7 +83,6 @@ def faceauth():
     camera = cv2.VideoCapture(0)
     # construct the eye tracker
     et = EyeTracker(os.path.dirname(os.path.abspath(__file__)))
-    print "Press a to authenticate"  # alert this when button is pressed
     dataout = dataStorage.out()
     data = []
 
@@ -135,13 +131,13 @@ def faceauth():
                 else:
                     camera.release()
                     cv2.destroyAllWindows()
-                    return jsonify('Fail!')
+                    return jsonify('Fail!, Please Authenticate Again.')
                     break
             if i == 5:
                 # cleanup the camera and close any open windows
                 camera.release()
                 cv2.destroyAllWindows()
-                return jsonify('Success!')
+                return jsonify('Success, Face Authenticated!')
             break
     # cleanup the camera and close any open windows
     camera.release()
