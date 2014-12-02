@@ -1,11 +1,9 @@
 import requests
 import hashlib
-import flask_cors
 
 from flask import Flask, render_template, url_for, request, redirect
 
 app = Flask(__name__)
-cors = flask_cors.CORS(app)
 app.config.from_object('settings.Config')
 
 @app.route('/')
