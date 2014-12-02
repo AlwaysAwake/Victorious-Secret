@@ -4,10 +4,22 @@
 
 $('button#submitemail').bind('click', function(){
    $('#record').css("display: block");
+     data= {
+           'email': $('#nameinput').val(),
+           'url': $('#recordingslist > li > a').attr('href')
+     }
+    $.post($SCRIPT_ROOT + "/voice", data, function(res){
+console.log(res);
+    });
+    /*
    $.ajax({
-       url: $SCRIPT_ROOT + "/signin",
-       contentType: "application/json; charset=utf-8",
        type: 'POST',
+       url: $SCRIPT_ROOT + "/voice",
+       contentType: "application/json; charset=utf-8",
+       data: {
+           'email': $('#nameinput').val(),
+           'url': $('#recordingslist > li > a').attr('href')
+       },
        success: function (response) {
             console.log(response);
        },
@@ -15,4 +27,5 @@ $('button#submitemail').bind('click', function(){
             console.log(error);
        }
    });
+   */
 });
