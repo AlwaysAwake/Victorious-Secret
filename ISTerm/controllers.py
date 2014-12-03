@@ -131,13 +131,13 @@ def faceauth():
                 else:
                     camera.release()
                     cv2.destroyAllWindows()
-                    return jsonify('Fail!, Please Authenticate Again.')
+                    return jsonify(result='Fail!, Please Authenticate Again.')
                     break
             if i == 5:
                 # cleanup the camera and close any open windows
                 camera.release()
                 cv2.destroyAllWindows()
-                return jsonify('Success, Face Authenticated!')
+                return jsonify(result='Success, Face Authenticated!')
             break
     # cleanup the camera and close any open windows
     camera.release()
@@ -175,6 +175,74 @@ def voice():
     r = requests.post(url, headers=payload)
     """
     return make_response("success")
+
+
+@app.route('/voice_enroll', methods=['GET', 'POST'])
+def voice_enroll():
+    email = 'lsywind3@gmail.com'
+    password = hashlib.sha256('1etka4o6').hexdigest()
+    developerId = '200011'
+    wavurl = request.form['url']
+
+    payload = {'VsitwavURL': wavurl, 'VsitEmail': email, 'VsitPassword': password, 'VsitDeveloperId': developerId}
+    r = requests.post("https://siv.voiceprintportal.com/sivservice/api/enrollments/bywavurl", headers=payload)
+
+    message = r.content.split(',')[0]
+
+
+    if message.find("Success") != -1:
+        return jsonify(result = "Voice Enrollment Succeeded!") # Success
+    else:
+        return jsonify(result = "Try again!") # Failed
+
+
+
+@app.route('/voice_verify', methods=['GET', 'POST'])
+def voice_verify():
+    email = 'lsywind3@gmail.com'
+    password = hashlib.sha256('1etka4o6').hexdigest()
+    developerId = '200011'
+    wavurl = 'http://minhwan90.cafe24.com/9ding/data/1417560480.wav'
+    accuracy = 3
+    accuracyPasses = 5
+    accuracyPassIncrement =3
+    confidence = 89
+
+    payload = {
+        'VsitwavURL': wavurl,
+        'VsitEmail': email,
+        'VsitPassword': password,
+        'VsitDeveloperId': developerId,
+        'VsitAccuracy': accuracy,
+        'VsitAccuracyPasses': accuracyPasses,
+        'VsitAccuracyPassIncrement': accuracyPassIncrement,
+        'VsitConfidence': confidence
+    }
+
+    r = requests.post("https://siv.voiceprintportal.com/sivservice/api/authentications/bywavurl", headers=payload)
+
+    message = r.content.split(',')[0]
+
+    return render_template("signup.html")
+    """
+    if message.find("Authentication successful.") != -1:
+        return jsonify(result = "Voice Authentication Succeeded!") # Success
+    elif message.find("Authentication failed.") != -1:
+        return jsonify(result = "Voice Authentication Failed!") # Failure
+    else:
+        return jsonify(result = "Try again!")
+    """
+
+@app.route('/get_enroll', methods=['GET', 'POST'])
+def get_enroll():
+    email = 'lsywind3@gmail.com'
+    password = hashlib.sha256('1etka4o6').hexdigest()
+    developerId = '200011'
+
+    payload = {'VsitEmail': email, 'VsitPassword': password, 'VsitDeveloperId': developerId}
+    r = requests.get("https://siv.voiceprintportal.com/sivservice/api/enrollments", headers=payload)
+
+    return render_template("signup.html")
 
 
 @app.route('/login', methods=['GET', 'POST'])
