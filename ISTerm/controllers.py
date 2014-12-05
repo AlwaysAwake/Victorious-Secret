@@ -144,39 +144,6 @@ def faceauth():
     cv2.destroyAllWindows()
 
 
-@app.route('/voice', methods=['POST'])
-def voice():
-    url = "https://siv.voiceprintportal.com/sivservice/api/enrollments/bywavurl"
-    print request.form['email']
-    wavurl = ""
-    """
-    passwd = hashlib.sha256(request.form['passwd']).hexdigest()
-    firstname = request.form['firstname']
-    lastname = request.form['lastname']
-    phone = request.form['phone']
-
-    payload = {
-        'VsitEmail': email,
-        'VsitPassword': passwd,
-        'VsitDeveloperId': app.config['DEVELOPER_ID'],
-        'VsitFirstName': firstname,
-        'VsitLastName': lastname,
-        'VsitPhone1': phone
-    }
-    """
-    """
-    payload = {
-        'VsitEmail': email,
-        'VsitPassword': hashlib.sha256(app.config['PASSWORD']).hexdigest(),
-        'VsitDeveloperId': app.config['DEVELOPER_ID'],
-        'VsitwavURL': wavurl
-    }
-
-    r = requests.post(url, headers=payload)
-    """
-    return make_response("success")
-
-
 @app.route('/voice_enroll', methods=['GET', 'POST'])
 def voice_enroll():
     email = 'lsywind3@gmail.com'
@@ -202,7 +169,7 @@ def voice_verify():
     email = 'lsywind3@gmail.com'
     password = hashlib.sha256('1etka4o6').hexdigest()
     developerId = '200011'
-    wavurl = 'http://minhwan90.cafe24.com/9ding/data/1417560480.wav'
+    wavurl = request.form['url']
     accuracy = 3
     accuracyPasses = 5
     accuracyPassIncrement =3
@@ -223,15 +190,14 @@ def voice_verify():
 
     message = r.content.split(',')[0]
 
-    return render_template("signup.html")
-    """
+
     if message.find("Authentication successful.") != -1:
         return jsonify(result = "Voice Authentication Succeeded!") # Success
     elif message.find("Authentication failed.") != -1:
         return jsonify(result = "Voice Authentication Failed!") # Failure
     else:
         return jsonify(result = "Try again!")
-    """
+
 
 @app.route('/get_enroll', methods=['GET', 'POST'])
 def get_enroll():
