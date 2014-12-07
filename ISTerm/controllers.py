@@ -190,13 +190,12 @@ def voice_verify():
 
     message = r.content.split(',')[0]
 
-
     if message.find("Authentication successful.") != -1:
-        return jsonify(result = "Voice Authentication Succeeded!") # Success
+        return jsonify(result="Voice Authentication Succeeded!") # Success
     elif message.find("Authentication failed.") != -1:
-        return jsonify(result = "Voice Authentication Failed!") # Failure
+        return jsonify(result="Voice Authentication Failed!") # Failure
     else:
-        return jsonify(result = "Try again!")
+        return jsonify(result="Try again!")
 
 
 @app.route('/get_enroll', methods=['GET', 'POST'])
