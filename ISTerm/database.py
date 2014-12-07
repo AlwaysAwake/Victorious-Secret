@@ -5,4 +5,3 @@ class Database(object):
         self.database.append(storage)
     def out(self):
         return self.database
-

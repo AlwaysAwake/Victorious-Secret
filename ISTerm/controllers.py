@@ -123,21 +123,20 @@ def faceauth():
         if cv2.waitKey(1) & 0xFF == ord("q"):
             break
         if cv2.waitKey(1) & 0xFF == ord("a"):
-            i = 0
-            for x in data:
-                if (x - 0.19 < ratioGet(rects)[i] < x + 0.19):
-                    i = i + 1
-                else:
-                    camera.release()
-                    cv2.destroyAllWindows()
-                    return jsonify(result='Fail!, Please Authenticate Again.')
-                    break
-            if i == 5:
-                # cleanup the camera and close any open windows
+            if (data[0]-0.2 < ratioGet(rects)[0] < data[0]+0.2) or (data[1]-0.14 < ratioGet(rects)[1] < data[1]+0.14) \
+                or (data[2]-0.19 < ratioGet(rects)[2] < data[2]+0.19) or (data[3]-0.3 < ratioGet(rects)[3] < data[3]+0.3) \
+                or (data[4]-0.15 < ratioGet(rects)[4] < data[4]+0.15):
                 camera.release()
                 cv2.destroyAllWindows()
                 return jsonify(result='Success, Face Authenticated!')
-            break
+                break
+            else:
+                camera.release()
+                cv2.destroyAllWindows()
+                return jsonify(result='Fail!, Please Authenticate Again.')
+                break
+
+        break
     # cleanup the camera and close any open windows
     camera.release()
     cv2.destroyAllWindows()
