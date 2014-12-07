@@ -83,11 +83,10 @@
           alert('waiting...');
 
           setTimeout(function () {
-            alert(temp);
             $.ajax({
                type: 'POST',
                url: $SCRIPT_ROOT + "/voice_verify",
-               data: {url: temp},
+               data: {url: temp, id:$('#email').val()},
                success: function (response) {
                     if(response['result'] == "Voice Authentication Succeeded!") {
                         alert(response['result']);

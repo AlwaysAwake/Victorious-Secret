@@ -1,12 +1,14 @@
+import os
+import cv2
 import requests
 import hashlib
 
+from flask import Flask, render_template, jsonify, url_for, request, redirect, make_response
+
 from pyimagesearch.eyetracker import EyeTracker
 from pyimagesearch import imutils
-import cv2, os
-from database import Database
 
-from flask import Flask, render_template, jsonify, url_for, request, redirect, make_response
+from database import Database
 
 app = Flask(__name__)
 app.config.from_object('settings.Config')
@@ -25,7 +27,7 @@ def main_page():
 @app.route('/signup', methods=['GET', 'POST'])
 def signup():
     if request.method == 'GET':
-        return render_template("signup.html")
+        return render_template("signup.html", active_tab="signup")
 
 
 @app.route('/faceregister', methods=['POST'])
@@ -58,8 +60,7 @@ def faceregister():
             if rect == "mouth":
                 cv2.rectangle(frame, (rects[rect][0], rects[rect][1]), (rects[rect][2], rects[rect][3]), (0, 0, 255), 1)
             if rect == "nose":
-                cv2.rectangle(frame, (rects[rect][0], rects[rect][1]), (rects[rect][2], rects[rect][3]), (0, 255, 255),
-                              1)
+                cv2.rectangle(frame, (rects[rect][0], rects[rect][1]), (rects[rect][2], rects[rect][3]), (0, 255, 255),1)
         # show the tracked eyes and face
         cv2.imshow("Tracking", frame)
 
@@ -91,7 +92,7 @@ def faceauth():
             data = i['face']
             flag = True
     if flag == False:
-        return jsonify(result ='Fail')
+        return jsonify(result="ID isn't found. Try another ID.")
 
 
     while True:
@@ -129,14 +130,11 @@ def faceauth():
                 camera.release()
                 cv2.destroyAllWindows()
                 return jsonify(result='Success, Face Authenticated!')
-                break
             else:
                 camera.release()
                 cv2.destroyAllWindows()
                 return jsonify(result='Fail!, Please Authenticate Again.')
-                break
 
-        break
     # cleanup the camera and close any open windows
     camera.release()
     cv2.destroyAllWindows()
@@ -144,40 +142,49 @@ def faceauth():
 
 @app.route('/voice_enroll', methods=['GET', 'POST'])
 def voice_enroll():
-    email = 'lsywind3@gmail.com'
-    password = hashlib.sha256('1etka4o6').hexdigest()
-    developerId = '200011'
+    password = hashlib.sha256(app.config['PASSWD']).hexdigest()
     wavurl = request.form['url']
+    userid = request.form['id']
+    dbindex = next(index for (index, d) in enumerate(dataStorage.database) if d["id"] == userid)
 
-    payload = {'VsitwavURL': wavurl, 'VsitEmail': email, 'VsitPassword': password, 'VsitDeveloperId': developerId}
+    payload = {
+        'VsitwavURL': wavurl,
+        'VsitEmail': app.config['ADMINEMAIL'],
+        'VsitPassword': password,
+        'VsitDeveloperId': app.config['DEVELOPER_ID']
+    }
     r = requests.post("https://siv.voiceprintportal.com/sivservice/api/enrollments/bywavurl", headers=payload)
 
     message = r.content.split(',')[0]
-
+    enrollment_id = r.content.split('"')[7]
 
     if message.find("Success") != -1:
-        return jsonify(result = "Voice Enrollment Succeeded!") # Success
+        dataStorage.database[dbindex]['voice'] = enrollment_id
+        return jsonify(result="Voice Enrollment Succeeded!") # Success
     else:
-        return jsonify(result = "Try again!") # Failed
-
+        return jsonify(result="Try again!") # Failed
 
 
 @app.route('/voice_verify', methods=['GET', 'POST'])
 def voice_verify():
-    email = 'lsywind3@gmail.com'
-    password = hashlib.sha256('1etka4o6').hexdigest()
-    developerId = '200011'
+    password = hashlib.sha256(app.config['PASSWD']).hexdigest()
     wavurl = request.form['url']
+    userid = request.form['id']
     accuracy = 3
     accuracyPasses = 5
     accuracyPassIncrement =3
     confidence = 89
 
+    try:
+        myindex = next(index for (index, d) in enumerate(dataStorage.database) if d["id"] == userid)
+    except StopIteration:
+        return jsonify(result="ID isn't found. Try another ID.")
+
     payload = {
         'VsitwavURL': wavurl,
-        'VsitEmail': email,
+        'VsitEmail': app.config['ADMINEMAIL'],
         'VsitPassword': password,
-        'VsitDeveloperId': developerId,
+        'VsitDeveloperId': app.config['DEVELOPER_ID'],
         'VsitAccuracy': accuracy,
         'VsitAccuracyPasses': accuracyPasses,
         'VsitAccuracyPassIncrement': accuracyPassIncrement,
@@ -187,8 +194,9 @@ def voice_verify():
     r = requests.post("https://siv.voiceprintportal.com/sivservice/api/authentications/bywavurl", headers=payload)
 
     message = r.content.split(',')[0]
+    enrollment_id = r.content.split('"')[7]
 
-    if message.find("Authentication successful.") != -1:
+    if dataStorage.database[myindex]['voice'] == enrollment_id and message.find("Authentication successful.") != -1:
         return jsonify(result="Voice Authentication Succeeded!") # Success
     elif message.find("Authentication failed.") != -1:
         return jsonify(result="Voice Authentication Failed!") # Failure
@@ -196,22 +204,10 @@ def voice_verify():
         return jsonify(result="Try again!")
 
 
-@app.route('/get_enroll', methods=['GET', 'POST'])
-def get_enroll():
-    email = 'lsywind3@gmail.com'
-    password = hashlib.sha256('1etka4o6').hexdigest()
-    developerId = '200011'
-
-    payload = {'VsitEmail': email, 'VsitPassword': password, 'VsitDeveloperId': developerId}
-    r = requests.get("https://siv.voiceprintportal.com/sivservice/api/enrollments", headers=payload)
-
-    return render_template("signup.html")
-
-
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'GET':
-        return render_template("recognition.html")
+        return render_template("recognition.html", active_tab="login")
     elif request.method == 'POST':
         pass
 
@@ -222,9 +218,11 @@ def login():
 def page_not_found(e):
     return render_template('404.html'), 404
 
+
 @app.errorhandler(500)
 def server_error(e):
     return render_template('500.html'), 500
+
 
 if __name__ == '__main__':
     app.run(debug=True)

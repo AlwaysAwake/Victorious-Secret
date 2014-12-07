@@ -8,8 +8,8 @@
     <!-- Collect the nav links, forms, and other content for toggling -->
     <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
       <ul class="nav navbar-nav">
-        <li class="active"><a href="{{ url_for('signup') }}">Sign-up <span class="sr-only">(current)</span></a></li>
-        <li><a href="{{ url_for('login') }}">Login</a></li>
+        <li {% if active_tab == "signup" %}class="active"{% endif %}><a href="{{ url_for('signup') }}">Sign-up <span class="sr-only">(current)</span></a></li>
+        <li {% if active_tab == "login" %}class="active"{% endif %}><a href="{{ url_for('login') }}">Login</a></li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
         <!-- 로그인 성공 여부를 적어야 하는 곳 -->

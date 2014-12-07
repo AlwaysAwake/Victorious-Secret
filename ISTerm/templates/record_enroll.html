@@ -83,16 +83,15 @@
           alert('waiting...');
 
           setTimeout(function () {
-            alert(temp);
             $.ajax({
                type: 'POST',
                url: $SCRIPT_ROOT + "/voice_enroll",
-               data: {url: temp},
+               data: {url: temp, id:$('#email').val()},
                success: function (response) {
                     if(response['result'] == "Voice Enrollment Succeeded!") {
                         alert(response['result']);
                         console.log($SCRIPT_ROOT);
-                        window.location.href =  $SCRIPT_ROOT;
+                        window.location.href = $SCRIPT_ROOT;
                     }
                     else {
                         alert(response['result']);
