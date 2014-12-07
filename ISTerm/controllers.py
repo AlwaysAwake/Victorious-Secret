@@ -114,8 +114,7 @@ def faceauth():
             if rect == "mouth":
                 cv2.rectangle(frame, (rects[rect][0], rects[rect][1]), (rects[rect][2], rects[rect][3]), (0, 0, 255), 1)
             if rect == "nose":
-                cv2.rectangle(frame, (rects[rect][0], rects[rect][1]), (rects[rect][2], rects[rect][3]), (0, 255, 255),
-                              1)
+                cv2.rectangle(frame, (rects[rect][0], rects[rect][1]), (rects[rect][2], rects[rect][3]), (0, 255, 255),1)
 
         # show the tracked eyes and face
         cv2.imshow("Tracking", frame)
