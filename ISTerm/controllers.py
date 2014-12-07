@@ -2,9 +2,12 @@ import os
 import sys
 import hashlib
 
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'lib'))
+
 import cv2
 import requests
-from flask import Flask, render_template, jsonify, request
+
+from lib.flask import Flask, render_template, jsonify, request
 
 from lib.pyimagesearch.eyetracker import EyeTracker
 from lib.pyimagesearch import imutils
@@ -13,8 +16,6 @@ from database import Database
 
 app = Flask(__name__)
 app.config.from_object('settings.Config')
-
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'lib'))
 
 dataStorage = Database()
 
